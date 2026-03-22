@@ -1,0 +1,36 @@
+name: Auto Commit Every Minute (Testing)
+
+on:
+  schedule:
+    - cron: "0 */2 * * *"  # Every 3 hours at minute 0
+  workflow_dispatch:
+
+permissions:
+  contents: write  # Grant write permission to the repository
+
+jobs:
+  auto-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.GH_TOKEN }}  # Use the PAT for checkout
+
+    - name: Set up Git
+      run: |
+        git config --global user.name "pramodsbaviskar7"
+        git config --global user.email "pramodsbaviskar7@gmail.com"
+
+    - name: Run Python Script
+      run: |
+        python3 scripts/auto_commit.py
+
+    - name: Commit & Push
+      run: |
+        git add .
+        git commit -m "commit bug fixes time" || echo "No changes to commit"
+        git push origin main
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
